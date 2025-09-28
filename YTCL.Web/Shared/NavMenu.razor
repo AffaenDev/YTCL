@@ -1,13 +1,13 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">YTCL</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+        <button title="Navigation menu" class="navbar-toggler" @onclick="() => OnToggleSidebar.InvokeAsync()">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+<div class="@(ShowSidebar ? "nav-scrollable open" : "nav-scrollable collapse")">
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
@@ -61,6 +61,8 @@
 </div>
 
 @code {
+    [Parameter] public bool ShowSidebar { get; set; }
+    [Parameter] public EventCallback OnToggleSidebar { get; set; }
     private bool collapseNavMenu = true;
     private HashSet<int> expandedLocations = new HashSet<int>();
 

@@ -2,12 +2,15 @@
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 
 <div class="page @(_isDarkMode ? "dark-mode" : "light-mode")">
-    <div class="sidebar">
-        <NavMenu />
+    <div class="sidebar" style="@(showSidebar ? "transform: translateX(0);" : "transform: translateX(-100%);") transition: transform 0.3s;">
+        <NavMenu ShowSidebar="showSidebar" OnToggleSidebar="ToggleSidebar" />
     </div>
 
     <main>
         <div class="top-row px-4">
+            <button class="hamburger-btn" @onclick="ToggleSidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="search-container">
                 <input type="text" class="search-input" placeholder="Search videos..." @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearch" />
                 <button class="search-button" @onclick="Search"><i class="bi bi-search"></i></button>
@@ -56,6 +59,7 @@
 @code {
     private bool _isDarkMode = true;
     private string searchQuery = "";
+    private bool showSidebar = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,5 +104,10 @@
     private void Register()
     {
         // Implement register functionality
+    }
+
+    private void ToggleSidebar()
+    {
+        showSidebar = !showSidebar;
     }
 }
