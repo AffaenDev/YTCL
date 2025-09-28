@@ -1,0 +1,129 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">YTCL</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <i class="bi bi-house-fill"></i> Home
+            </NavLink>
+        </div>
+        
+        <div class="nav-section">
+            <h5>Categories</h5>
+            @foreach (var category in categories)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@($"category/{category.Id}")">
+                        <i class="bi bi-tag-fill"></i> @category.Name
+                    </NavLink>
+                </div>
+            }
+        </div>
+        
+        <div class="nav-section">
+            <h5>Locations</h5>
+            @foreach (var location in locations)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@($"location/{location.Id}")">
+                        <i class="bi bi-geo-alt-fill"></i> @location.Name
+                    </NavLink>
+                    @if (location.Children.Any() && expandedLocations.Contains(location.Id))
+                    {
+                        <div class="sub-nav">
+                            @foreach (var child in location.Children)
+                            {
+                                <div class="nav-item px-4">
+                                    <NavLink class="nav-link" href="@($"location/{child.Id}")">
+                                        @child.Name
+                                    </NavLink>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="trending">
+                <i class="bi bi-graph-up"></i> Trending
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private HashSet<int> expandedLocations = new HashSet<int>();
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+    
+    // Mock data for categories
+    private List<Category> categories = new List<Category>
+    {
+        new Category { Id = 1, Name = "Car Sales" },
+        new Category { Id = 2, Name = "Truck Sales" },
+        new Category { Id = 3, Name = "Apartments for Sale" },
+        new Category { Id = 4, Name = "Apartments for Rent" },
+        new Category { Id = 5, Name = "Room for Rent" },
+        new Category { Id = 6, Name = "Furniture" }
+    };
+    
+    // Mock data for locations
+    private List<Location> locations = new List<Location>
+    {
+        new Location { 
+            Id = 1, 
+            Name = "USA", 
+            Children = new List<Location> {
+                new Location { Id = 4, Name = "California" },
+                new Location { Id = 5, Name = "New York" },
+                new Location { Id = 6, Name = "Texas" }
+            }
+        },
+        new Location { 
+            Id = 2, 
+            Name = "Europe", 
+            Children = new List<Location> {
+                new Location { Id = 7, Name = "UK" },
+                new Location { Id = 8, Name = "Germany" },
+                new Location { Id = 9, Name = "France" }
+            }
+        },
+        new Location { 
+            Id = 3, 
+            Name = "Asia", 
+            Children = new List<Location> {
+                new Location { Id = 10, Name = "Japan" },
+                new Location { Id = 11, Name = "China" },
+                new Location { Id = 12, Name = "India" }
+            }
+        }
+    };
+    
+    private class Category
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+    
+    private class Location
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public List<Location> Children { get; set; } = new List<Location>();
+    }
+}

@@ -1,0 +1,151 @@
+@page "/category/{CategoryId:int}"
+
+<PageTitle>YTCL - @categoryName Videos</PageTitle>
+
+<div class="video-wall-container">
+    <h1 class="section-title">@categoryName Videos</h1>
+    
+    <div class="video-grid">
+        @foreach (var video in videos)
+        {
+            <div class="video-card">
+                <div class="thumbnail-container">
+                    <img src="@video.ThumbnailUrl" alt="@video.Title" class="video-thumbnail" loading="lazy" />
+                    <div class="video-duration">@video.Duration</div>
+                </div>
+                <div class="video-info">
+                    <h3 class="video-title">@video.Title</h3>
+                    <p class="video-publisher">@video.Publisher</p>
+                    <div class="video-metadata">
+                        <span class="video-views">@video.Views views</span>
+                        <span class="video-date">@video.UploadDate</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    
+    @if (isLoading)
+    {
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="load-more-container" id="loadMoreTrigger" @ref="loadMoreElement">
+            <button class="btn btn-outline-primary" @onclick="LoadMoreVideos">Load More</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int CategoryId { get; set; }
+    
+    private string categoryName = "Category";
+    private List<VideoViewModel> videos = new List<VideoViewModel>();
+    private bool isLoading = false;
+    private int currentPage = 1;
+    private ElementReference loadMoreElement;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        // Get category name based on ID
+        await GetCategoryName();
+        await LoadVideos();
+        
+        // Set up intersection observer for infinite scrolling
+        await Task.Delay(500); // Wait for render
+        await SetupIntersectionObserver();
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        // Reset when category changes
+        videos.Clear();
+        currentPage = 1;
+        await GetCategoryName();
+        await LoadVideos();
+    }
+    
+    private async Task GetCategoryName()
+    {
+        // In a real app, this would come from an API
+        // Mock data for now
+        var categories = new Dictionary<int, string>
+        {
+            { 1, "Car Sales" },
+            { 2, "Truck Sales" },
+            { 3, "Apartments for Sale" },
+            { 4, "Apartments for Rent" },
+            { 5, "Room for Rent" },
+            { 6, "Furniture" }
+        };
+        
+        if (categories.ContainsKey(CategoryId))
+        {
+            categoryName = categories[CategoryId];
+        }
+        else
+        {
+            categoryName = $"Category {CategoryId}";
+        }
+    }
+    
+    private async Task SetupIntersectionObserver()
+    {
+        await JSRuntime.InvokeVoidAsync("setupIntersectionObserver", 
+            loadMoreElement, DotNetObjectReference.Create(this));
+    }
+    
+    [JSInvokable]
+    public async Task OnIntersection()
+    {
+        await LoadMoreVideos();
+    }
+    
+    private async Task LoadVideos()
+    {
+        isLoading = true;
+        await Task.Delay(500); // Simulate API call
+        
+        // Mock data - in a real app, this would come from an API filtered by category
+        var newVideos = Enumerable.Range((currentPage - 1) * 12 + 1, 12).Select(i => new VideoViewModel
+        {
+            Id = i,
+            Title = $"{categoryName} Video {i}: Amazing content for your entertainment",
+            ThumbnailUrl = $"https://picsum.photos/id/{i + 100 + CategoryId * 20}/320/180",
+            Publisher = $"Publisher {i % 10 + 1}",
+            Views = Random.Shared.Next(100, 1000000),
+            UploadDate = DateTime.Now.AddDays(-Random.Shared.Next(1, 365)).ToString("MMM d, yyyy"),
+            Duration = $"{Random.Shared.Next(1, 10)}:{Random.Shared.Next(10, 59)}"
+        }).ToList();
+        
+        videos.AddRange(newVideos);
+        isLoading = false;
+        StateHasChanged();
+    }
+    
+    private async Task LoadMoreVideos()
+    {
+        if (!isLoading)
+        {
+            currentPage++;
+            await LoadVideos();
+        }
+    }
+    
+    public class VideoViewModel
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string ThumbnailUrl { get; set; } = string.Empty;
+        public string Publisher { get; set; } = string.Empty;
+        public int Views { get; set; }
+        public string UploadDate { get; set; } = string.Empty;
+        public string Duration { get; set; } = string.Empty;
+    }
+}
