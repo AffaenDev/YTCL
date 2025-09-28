@@ -52,10 +52,16 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadVideos();
-        
-        // Set up intersection observer for infinite scrolling
-        await Task.Delay(500); // Wait for render
-        await SetupIntersectionObserver();
+        // Rimosso: la chiamata JS interop non può essere qui in Blazor Server
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(500); // Wait for render
+            await SetupIntersectionObserver();
+        }
     }
     
     private async Task SetupIntersectionObserver()

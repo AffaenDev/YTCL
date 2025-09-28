@@ -1,9 +1,5 @@
 @inherits LayoutComponentBase
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
-@using Microsoft.AspNetCore.Components.Authorization
-@using System.Security.Claims
-@using Microsoft.JSInterop
-@using Microsoft.AspNetCore.Components.Web
 
 <div class="page @(_isDarkMode ? "dark-mode" : "light-mode")">
     <div class="sidebar">
@@ -63,9 +59,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Try to load theme preference from local storage
-        var storedTheme = await JSRuntime.InvokeAsync<string>("localStorage.getItem", new object[] { "themePreference" });
-        _isDarkMode = storedTheme == "dark";
+        // Rimosso: la chiamata JS interop non può essere qui in Blazor Server
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var storedTheme = await JSRuntime.InvokeAsync<string>("localStorage.getItem", new object[] { "themePreference" });
+            _isDarkMode = storedTheme == "dark";
+            StateHasChanged();
+        }
     }
 
     private async Task ToggleTheme()
