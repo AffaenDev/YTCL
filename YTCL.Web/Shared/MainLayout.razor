@@ -1,5 +1,9 @@
 @inherits LayoutComponentBase
-@inject IJSRuntime JSRuntime
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Web
 
 <div class="page @(_isDarkMode ? "dark-mode" : "light-mode")">
     <div class="sidebar">
@@ -26,10 +30,10 @@
             </div>
             <div class="auth-buttons">
                 <AuthorizeView>
-                    <Authorized>
+                    <Authorized Context="authContext">
                         <div class="dropdown">
                             <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="@context.User.FindFirst("picture")?.Value" alt="Profile" class="profile-pic" />
+                                <img src="@authContext.User.FindFirst("picture")?.Value" alt="Profile" class="profile-pic" />
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="profile">Profile</a></li>
@@ -60,14 +64,14 @@
     protected override async Task OnInitializedAsync()
     {
         // Try to load theme preference from local storage
-        var storedTheme = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "themePreference");
+        var storedTheme = await JSRuntime.InvokeAsync<string>("localStorage.getItem", new object[] { "themePreference" });
         _isDarkMode = storedTheme == "dark";
     }
 
     private async Task ToggleTheme()
     {
         _isDarkMode = !_isDarkMode;
-        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "themePreference", _isDarkMode ? "dark" : "light");
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", new object[] { "themePreference", _isDarkMode ? "dark" : "light" });
     }
 
     private void HandleSearch(KeyboardEventArgs e)
