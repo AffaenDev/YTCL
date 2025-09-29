@@ -2,14 +2,16 @@
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 
 <div class="page @(_isDarkMode ? "dark-mode" : "light-mode")">
-    <div class="sidebar" style="@(showSidebar ? "transform: translateX(0);" : "transform: translateX(-100%);") transition: transform 0.3s;">
+    <div class="sidebar @(showSidebar ? "open" : "")">
         <NavMenu ShowSidebar="showSidebar" OnToggleSidebar="ToggleSidebar" />
     </div>
 
     <main>
         <div class="top-row px-4">
             <button class="hamburger-btn" @onclick="ToggleSidebar">
-                <span class="navbar-toggler-icon"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
             </button>
             <div class="search-container">
                 <input type="text" class="search-input" placeholder="Search videos..." @bind="searchQuery" @bind:event="oninput" @onkeyup="HandleSearch" />

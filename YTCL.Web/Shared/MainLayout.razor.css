@@ -1,3 +1,30 @@
+/* MainLayout.razor.css */
+
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    transition: margin-left 0.3s;
+    margin-left: 0; /* Ensure no default margin */
+}
+
+.dark-mode, .dark-mode body {
+    background-color: #121212;
+    color: #e0e0e0; /* Light grey for text */
+}
+
+.dark-mode .top-row, .dark-mode .sidebar {
+    background-color: #1e1e1e;
+}
+
+.dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode .btn {
+    color: #ffffff; /* White for headings and buttons */
+}
+
 .sidebar {
     background: #222;
     color: #fff;
@@ -6,13 +33,10 @@
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 1000;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s;
-}
-
-.sidebar.collapse {
+    z-index: 1050;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
     transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
 }
 
 .sidebar.open {
@@ -22,13 +46,45 @@
 .hamburger-btn {
     background: none;
     border: none;
-    font-size: 2rem;
-    margin-right: 1rem;
     cursor: pointer;
+    z-index: 1051;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center bars vertically */
+    align-items: center; /* Center bars horizontally */
+    width: 40px;
+    height: 40px;
 }
 
+.hamburger-btn .icon-bar {
+    display: block;
+    width: 24px; /* Adjust width for padding */
+    height: 2px;
+    background-color: #fff;
+    border-radius: 1px;
+    margin: 3px 0; /* Add vertical margin for spacing */
+}
+
+.top-row {
+    display: flex;
+    align-items: center;
+}
+
+/* Desktop view: push content */
+@media (min-width: 769px) {
+    .sidebar.open ~ main {
+        margin-left: 260px;
+    }
+}
+
+/* Mobile view: sidebar overlays content */
 @media (max-width: 768px) {
     .sidebar {
-        width: 200px;
+        width: 240px;
+    }
+
+    .sidebar.open ~ main {
+        margin-left: 0;
     }
 }
